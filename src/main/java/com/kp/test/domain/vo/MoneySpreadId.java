@@ -9,30 +9,35 @@ import org.springframework.util.StringUtils;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class Token implements Serializable {
+public class MoneySpreadId implements Serializable {
 
 	private static final long serialVersionUID = 8839088380398635828L;
 	
 	private final String value;
-	
-	public static Token from(String tokenValue) {
-		
-		if(StringUtils.isEmpty(tokenValue)) {
-			throw new IllegalArgumentException("token value cannot be empty");
+
+	protected static MoneySpreadId from(String value) {
+
+		if(StringUtils.isEmpty(value)) {
+			throw new IllegalArgumentException("MoneySpreadId value cannot be empty");
 		}
-		
-		return new Token(tokenValue);
+
+		return new MoneySpreadId(value);
+	}
+
+	public static MoneySpreadId from(UUID uuid) {
+		return MoneySpreadId.from(uuid.toString());
 	}
 
 	@Converter(autoApply = true)
-	public static class TokenConverter implements AttributeConverter<Token, String> {
+	public static class MoneySpreadIdConverter implements AttributeConverter<MoneySpreadId, String> {
 
 		@Override
-		public String convertToDatabaseColumn(Token attribute) {
+		public String convertToDatabaseColumn(MoneySpreadId attribute) {
 
 			if(attribute == null) {
 				return null;
@@ -42,13 +47,13 @@ public class Token implements Serializable {
 		}
 
 		@Override
-		public Token convertToEntityAttribute(String dbData) {
+		public MoneySpreadId convertToEntityAttribute(String dbData) {
 
 			if(StringUtils.isEmpty(dbData)) {
 				return null;
 			}
 
-			return Token.from(dbData);
+			return MoneySpreadId.from(dbData);
 		}
 	}
 }

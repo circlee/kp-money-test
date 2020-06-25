@@ -10,29 +10,30 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.io.Serializable;
 
+
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class Token implements Serializable {
+public class RoomId implements Serializable {
 
-	private static final long serialVersionUID = 8839088380398635828L;
+	private static final long serialVersionUID = 3668749708532705679L;
 	
-	private final String value;
+	private final Long value;
 	
-	public static Token from(String tokenValue) {
+	public static RoomId from(Long value) {
 		
-		if(StringUtils.isEmpty(tokenValue)) {
+		if(value == null) {
 			throw new IllegalArgumentException("token value cannot be empty");
 		}
 		
-		return new Token(tokenValue);
+		return new RoomId(value);
 	}
 
 	@Converter(autoApply = true)
-	public static class TokenConverter implements AttributeConverter<Token, String> {
+	public static class RoomIdConverter implements AttributeConverter<RoomId, Long> {
 
 		@Override
-		public String convertToDatabaseColumn(Token attribute) {
+		public Long convertToDatabaseColumn(RoomId attribute) {
 
 			if(attribute == null) {
 				return null;
@@ -42,13 +43,13 @@ public class Token implements Serializable {
 		}
 
 		@Override
-		public Token convertToEntityAttribute(String dbData) {
+		public RoomId convertToEntityAttribute(Long dbData) {
 
 			if(StringUtils.isEmpty(dbData)) {
 				return null;
 			}
 
-			return Token.from(dbData);
+			return RoomId.from(dbData);
 		}
 	}
 }

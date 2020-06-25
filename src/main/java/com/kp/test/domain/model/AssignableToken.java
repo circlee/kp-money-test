@@ -1,28 +1,17 @@
 package com.kp.test.domain.model;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
-import javax.persistence.Version;
-
 import com.kp.test.domain.vo.Token;
 import com.kp.test.domain.vo.UserId;
+import lombok.*;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
@@ -36,11 +25,14 @@ public class AssignableToken implements Serializable {
 
 	@Id
 	private Token token;
-	
+
+	@Column(nullable = false)
 	private LocalDateTime expiredAt;
-	
+
+	@Column(nullable = false)
 	private UserId assignedBy;
-	
+
+	@Column(nullable = false)
 	private LocalDateTime assignedAt;
 	
 	@Version
