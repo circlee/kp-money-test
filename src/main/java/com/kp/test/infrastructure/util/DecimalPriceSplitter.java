@@ -13,7 +13,8 @@ public class DecimalPriceSplitter implements Price.PriceSplitter {
 
     private static int SCALE = 0;
 
-    private DecimalPriceSplitter(){}
+    private DecimalPriceSplitter() {
+    }
 
     private static class DecimalPriceSplitterHolder {
         private static DecimalPriceSplitter INSTANCE = new DecimalPriceSplitter();
@@ -28,19 +29,19 @@ public class DecimalPriceSplitter implements Price.PriceSplitter {
 
         BigDecimal originValue = origin.getValue();
 
-        BigDecimal perRoundDownValue = originValue.divide(BigDecimal.valueOf(divideSize), SCALE , RoundingMode.DOWN);
+        BigDecimal perRoundDownValue = originValue.divide(BigDecimal.valueOf(divideSize), SCALE, RoundingMode.DOWN);
 
-        if(perRoundDownValue.compareTo(BigDecimal.ZERO) <= 0) {
+        if (perRoundDownValue.compareTo(BigDecimal.ZERO) <= 0) {
             throw new UnsupportedOperationException("0 이하로 나눠질수 없습니다");
         }
 
         BigDecimal remainValue = originValue.subtract(perRoundDownValue.multiply(BigDecimal.valueOf(divideSize)));
 
         AtomicInteger remainOneCount = new AtomicInteger(remainValue.divide(BigDecimal.ONE).intValue());
-        return IntStream.range(0,divideSize)
+        return IntStream.range(0, divideSize)
                 .mapToObj(i -> {
                     Integer remainOneCountValue = remainOneCount.getAndDecrement();
-                    if(remainOneCountValue.compareTo(0) > 0) {
+                    if (remainOneCountValue.compareTo(0) > 0) {
                         return perRoundDownValue.add(BigDecimal.ONE);
                     }
                     return perRoundDownValue;
@@ -50,7 +51,6 @@ public class DecimalPriceSplitter implements Price.PriceSplitter {
                 .collect(Collectors.toList());
 
     }
-
 
 
 }

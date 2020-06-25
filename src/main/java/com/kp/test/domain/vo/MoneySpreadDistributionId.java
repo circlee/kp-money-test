@@ -16,44 +16,44 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MoneySpreadDistributionId implements Serializable {
 
-	private static final long serialVersionUID = 8839088380398635828L;
-	
-	private final String value;
+    private static final long serialVersionUID = 8839088380398635828L;
 
-	protected static MoneySpreadDistributionId from(String value) {
+    private final String value;
 
-		if(StringUtils.isEmpty(value)) {
-			throw new IllegalArgumentException("MoneySpreadId value cannot be empty");
-		}
+    protected static MoneySpreadDistributionId from(String value) {
 
-		return new MoneySpreadDistributionId(value);
-	}
+        if (StringUtils.isEmpty(value)) {
+            throw new IllegalArgumentException("MoneySpreadId value cannot be empty");
+        }
 
-	public static MoneySpreadDistributionId from(UUID uuid) {
-		return MoneySpreadDistributionId.from(uuid.toString());
-	}
+        return new MoneySpreadDistributionId(value);
+    }
 
-	@Converter(autoApply = true)
-	public static class MoneySpreadIdConverter implements AttributeConverter<MoneySpreadDistributionId, String> {
+    public static MoneySpreadDistributionId from(UUID uuid) {
+        return MoneySpreadDistributionId.from(uuid.toString());
+    }
 
-		@Override
-		public String convertToDatabaseColumn(MoneySpreadDistributionId attribute) {
+    @Converter(autoApply = true)
+    public static class MoneySpreadIdConverter implements AttributeConverter<MoneySpreadDistributionId, String> {
 
-			if(attribute == null) {
-				return null;
-			}
+        @Override
+        public String convertToDatabaseColumn(MoneySpreadDistributionId attribute) {
 
-			return attribute.getValue();
-		}
+            if (attribute == null) {
+                return null;
+            }
 
-		@Override
-		public MoneySpreadDistributionId convertToEntityAttribute(String dbData) {
+            return attribute.getValue();
+        }
 
-			if(StringUtils.isEmpty(dbData)) {
-				return null;
-			}
+        @Override
+        public MoneySpreadDistributionId convertToEntityAttribute(String dbData) {
 
-			return MoneySpreadDistributionId.from(dbData);
-		}
-	}
+            if (StringUtils.isEmpty(dbData)) {
+                return null;
+            }
+
+            return MoneySpreadDistributionId.from(dbData);
+        }
+    }
 }

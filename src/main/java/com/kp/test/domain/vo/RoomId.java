@@ -16,40 +16,40 @@ import java.io.Serializable;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoomId implements Serializable {
 
-	private static final long serialVersionUID = 3668749708532705679L;
-	
-	private final Long value;
-	
-	public static RoomId from(Long value) {
-		
-		if(value == null) {
-			throw new IllegalArgumentException("token value cannot be empty");
-		}
-		
-		return new RoomId(value);
-	}
+    private static final long serialVersionUID = 3668749708532705679L;
 
-	@Converter(autoApply = true)
-	public static class RoomIdConverter implements AttributeConverter<RoomId, Long> {
+    private final Long value;
 
-		@Override
-		public Long convertToDatabaseColumn(RoomId attribute) {
+    public static RoomId from(Long value) {
 
-			if(attribute == null) {
-				return null;
-			}
+        if (value == null) {
+            throw new IllegalArgumentException("token value cannot be empty");
+        }
 
-			return attribute.getValue();
-		}
+        return new RoomId(value);
+    }
 
-		@Override
-		public RoomId convertToEntityAttribute(Long dbData) {
+    @Converter(autoApply = true)
+    public static class RoomIdConverter implements AttributeConverter<RoomId, Long> {
 
-			if(StringUtils.isEmpty(dbData)) {
-				return null;
-			}
+        @Override
+        public Long convertToDatabaseColumn(RoomId attribute) {
 
-			return RoomId.from(dbData);
-		}
-	}
+            if (attribute == null) {
+                return null;
+            }
+
+            return attribute.getValue();
+        }
+
+        @Override
+        public RoomId convertToEntityAttribute(Long dbData) {
+
+            if (StringUtils.isEmpty(dbData)) {
+                return null;
+            }
+
+            return RoomId.from(dbData);
+        }
+    }
 }

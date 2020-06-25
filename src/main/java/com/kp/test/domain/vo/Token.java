@@ -15,40 +15,46 @@ import java.io.Serializable;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Token implements Serializable {
 
-	private static final long serialVersionUID = 8839088380398635828L;
-	
-	private final String value;
-	
-	public static Token from(String tokenValue) {
-		
-		if(StringUtils.isEmpty(tokenValue)) {
-			throw new IllegalArgumentException("token value cannot be empty");
-		}
-		
-		return new Token(tokenValue);
-	}
+    private static final long serialVersionUID = 8839088380398635828L;
 
-	@Converter(autoApply = true)
-	public static class TokenConverter implements AttributeConverter<Token, String> {
+    public static int TOKEN_VALUE_LENGHT = 3;
 
-		@Override
-		public String convertToDatabaseColumn(Token attribute) {
+    private final String value;
 
-			if(attribute == null) {
-				return null;
-			}
+    public static Token from(String tokenValue) {
 
-			return attribute.getValue();
-		}
+        if (StringUtils.isEmpty(tokenValue)) {
+            throw new IllegalArgumentException("token value cannot be empty");
+        }
 
-		@Override
-		public Token convertToEntityAttribute(String dbData) {
+        if (tokenValue.length() != TOKEN_VALUE_LENGHT) {
+            throw new IllegalArgumentException("token value length must be " + TOKEN_VALUE_LENGHT);
+        }
 
-			if(StringUtils.isEmpty(dbData)) {
-				return null;
-			}
+        return new Token(tokenValue);
+    }
 
-			return Token.from(dbData);
-		}
-	}
+    @Converter(autoApply = true)
+    public static class TokenConverter implements AttributeConverter<Token, String> {
+
+        @Override
+        public String convertToDatabaseColumn(Token attribute) {
+
+            if (attribute == null) {
+                return null;
+            }
+
+            return attribute.getValue();
+        }
+
+        @Override
+        public Token convertToEntityAttribute(String dbData) {
+
+            if (StringUtils.isEmpty(dbData)) {
+                return null;
+            }
+
+            return Token.from(dbData);
+        }
+    }
 }

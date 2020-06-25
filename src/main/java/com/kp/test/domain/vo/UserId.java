@@ -16,40 +16,40 @@ import java.io.Serializable;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserId implements Serializable {
 
-	private static final long serialVersionUID = 3668749708532705679L;
-	
-	private final Long value;
-	
-	public static UserId from(Long value) {
-		
-		if(value == null) {
-			throw new IllegalArgumentException("token value cannot be empty");
-		}
-		
-		return new UserId(value);
-	}
+    private static final long serialVersionUID = 3668749708532705679L;
 
-	@Converter(autoApply = true)
-	public static class UserIdConverter implements AttributeConverter<UserId, Long> {
+    private final Long value;
 
-		@Override
-		public Long convertToDatabaseColumn(UserId attribute) {
+    public static UserId from(Long value) {
 
-			if(attribute == null) {
-				return null;
-			}
+        if (value == null) {
+            throw new IllegalArgumentException("token value cannot be empty");
+        }
 
-			return attribute.getValue();
-		}
+        return new UserId(value);
+    }
 
-		@Override
-		public UserId convertToEntityAttribute(Long dbData) {
+    @Converter(autoApply = true)
+    public static class UserIdConverter implements AttributeConverter<UserId, Long> {
 
-			if(StringUtils.isEmpty(dbData)) {
-				return null;
-			}
+        @Override
+        public Long convertToDatabaseColumn(UserId attribute) {
 
-			return UserId.from(dbData);
-		}
-	}
+            if (attribute == null) {
+                return null;
+            }
+
+            return attribute.getValue();
+        }
+
+        @Override
+        public UserId convertToEntityAttribute(Long dbData) {
+
+            if (StringUtils.isEmpty(dbData)) {
+                return null;
+            }
+
+            return UserId.from(dbData);
+        }
+    }
 }

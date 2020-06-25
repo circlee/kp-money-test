@@ -36,7 +36,7 @@ public class MoneySpreadDistribution {
     @Version
     private Long version;
 
-    public static MoneySpreadDistribution from(Price price) {
+    protected static MoneySpreadDistribution from(Price price) {
         return MoneySpreadDistribution.builder()
                 .id(MoneySpreadDistributionId.from(UUID.randomUUID()))
                 .price(price)
@@ -45,16 +45,23 @@ public class MoneySpreadDistribution {
 
     public void receive(UserId receiver) {
 
-        if(this.getReceiver() != null) {
+        if (this.getReceiver() != null) {
             throw new IllegalStateException("이미 수신된 금액을 수신할수 없습니다.");
         }
 
-        if(this.getReceivedAt() != null) {
+        if (this.getReceivedAt() != null) {
             throw new IllegalStateException("이미 수신된 금액을 수신할수 없습니다.");
         }
 
         this.setReceiver(receiver);
         this.setReceivedAt(LocalDateTime.now());
+    }
+
+    public boolean isReceived() {
+        if (this.getReceiver() != null || this.getReceivedAt() != null) {
+            return true;
+        }
+        return false;
     }
 
 }

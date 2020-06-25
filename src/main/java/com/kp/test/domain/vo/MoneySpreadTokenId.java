@@ -14,30 +14,30 @@ import java.util.UUID;
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MoneySpreadId implements Serializable {
+public class MoneySpreadTokenId implements Serializable {
 
     private static final long serialVersionUID = 8839088380398635828L;
 
     private final String value;
 
-    protected static MoneySpreadId from(String value) {
+    protected static MoneySpreadTokenId from(String value) {
 
         if (StringUtils.isEmpty(value)) {
             throw new IllegalArgumentException("MoneySpreadId value cannot be empty");
         }
 
-        return new MoneySpreadId(value);
+        return new MoneySpreadTokenId(value);
     }
 
-    public static MoneySpreadId from(UUID uuid) {
-        return MoneySpreadId.from(uuid.toString());
+    public static MoneySpreadTokenId from(UUID uuid) {
+        return MoneySpreadTokenId.from(uuid.toString());
     }
 
     @Converter(autoApply = true)
-    public static class MoneySpreadIdConverter implements AttributeConverter<MoneySpreadId, String> {
+    public static class MoneySpreadIdConverter implements AttributeConverter<MoneySpreadTokenId, String> {
 
         @Override
-        public String convertToDatabaseColumn(MoneySpreadId attribute) {
+        public String convertToDatabaseColumn(MoneySpreadTokenId attribute) {
 
             if (attribute == null) {
                 return null;
@@ -47,13 +47,13 @@ public class MoneySpreadId implements Serializable {
         }
 
         @Override
-        public MoneySpreadId convertToEntityAttribute(String dbData) {
+        public MoneySpreadTokenId convertToEntityAttribute(String dbData) {
 
             if (StringUtils.isEmpty(dbData)) {
                 return null;
             }
 
-            return MoneySpreadId.from(dbData);
+            return MoneySpreadTokenId.from(dbData);
         }
     }
 }

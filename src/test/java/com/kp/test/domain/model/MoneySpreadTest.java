@@ -1,20 +1,22 @@
 package com.kp.test.domain.model;
 
+import com.kp.test.domain.vo.MoneySpreadTokenId;
 import com.kp.test.domain.vo.Price;
 import com.kp.test.domain.vo.RoomId;
-import com.kp.test.domain.vo.Token;
 import com.kp.test.domain.vo.UserId;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 public class MoneySpreadTest {
 
     public MoneySpread getMoneySpread(int distributionSize) {
-        return MoneySpread.create(RoomId.from(100L)
-                , Token.from("test")
+        return MoneySpread.create(
+                MoneySpreadTokenId.from(UUID.randomUUID())
+                , RoomId.from(100L)
                 , Price.from(BigDecimal.valueOf(100L))
                 , distributionSize
                 , UserId.from(100L)
@@ -48,4 +50,5 @@ public class MoneySpreadTest {
         Assertions.assertThatThrownBy(() -> getMoneySpread(distributionSize))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
+
 }

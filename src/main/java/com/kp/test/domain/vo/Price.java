@@ -18,48 +18,52 @@ import java.util.List;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Price implements Serializable {
 
-	private static final long serialVersionUID = 3668749708532705679L;
-	
-	private final BigDecimal value;
-	
-	public static Price from(BigDecimal value) {
-		
-		if(value == null) {
-			throw new IllegalArgumentException("price value cannot be empty");
-		}
-		
-		return new Price(value);
-	}
+    private static final long serialVersionUID = 3668749708532705679L;
 
-	public List<Price> split(PriceSplitter splitter, int size) {
-		return splitter.split(this, size);
-	}
+    private final BigDecimal value;
 
-	public interface PriceSplitter {
-		List<Price> split(Price origin, int divideSize);
-	}
+    public static Price from(BigDecimal value) {
 
-	@Converter(autoApply = true)
-	public static class PriceConverter implements AttributeConverter<Price, BigDecimal> {
+        if (value == null) {
+            throw new IllegalArgumentException("price value cannot be empty");
+        }
 
-		@Override
-		public BigDecimal convertToDatabaseColumn(Price attribute) {
+        return new Price(value);
+    }
 
-			if(attribute == null) {
-				return null;
-			}
+    public List<Price> split(PriceSplitter splitter, int size) {
+        return splitter.split(this, size);
+    }
 
-			return attribute.getValue();
-		}
+    public interface PriceSplitter {
+        List<Price> split(Price origin, int divideSize);
+    }
 
-		@Override
-		public Price convertToEntityAttribute(BigDecimal dbData) {
+    public Price add(Price price) {
+        return new Price(this.getValue().add(price.getValue()));
+    }
 
-			if(StringUtils.isEmpty(dbData)) {
-				return null;
-			}
+    @Converter(autoApply = true)
+    public static class PriceConverter implements AttributeConverter<Price, BigDecimal> {
 
-			return Price.from(dbData);
-		}
-	}
+        @Override
+        public BigDecimal convertToDatabaseColumn(Price attribute) {
+
+            if (attribute == null) {
+                return null;
+            }
+
+            return attribute.getValue();
+        }
+
+        @Override
+        public Price convertToEntityAttribute(BigDecimal dbData) {
+
+            if (StringUtils.isEmpty(dbData)) {
+                return null;
+            }
+
+            return Price.from(dbData);
+        }
+    }
 }
