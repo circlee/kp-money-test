@@ -33,16 +33,16 @@ $> gradle bootRun
 curl -X POST \
   http://localhost:10080/spreads \
   -H 'content-type: application/json' \
-  -H 'X-ROOM-ID: 12345' \
-  -H 'X-USER-ID: 101' \
+  -H 'X-ROOM-ID: {roomId}' \
+  -H 'X-USER-ID: {userID}' \
   -d '{"distributionSize":5,"depositPrice":20000}'
 ```
 
 > 뿌리기 받기 API
 ```
-curl --location --request POST 'http://localhost:10080/spreads/m1K/receive' \
---header 'X-ROOM-ID: 12345' \
---header 'X-USER-ID: 102' \
+curl --location --request POST 'http://localhost:10080/spreads/{token}/receive' \
+--header 'X-ROOM-ID: {roomId}' \
+--header 'X-USER-ID: {userID}' \
 --header 'Content-Type: application/json' \
 --data-raw ''
 ```
@@ -50,9 +50,9 @@ curl --location --request POST 'http://localhost:10080/spreads/m1K/receive' \
 > 뿌리기 확인 API
 
 ```
-curl --location --request GET 'http://localhost:10080/spreads/m1K' \
---header 'X-ROOM-ID: 12345' \
---header 'X-USER-ID: 101' \
+curl --location --request GET 'http://localhost:10080/spreads/{token}' \
+--header 'X-ROOM-ID: {roomId}' \
+--header 'X-USER-ID: {userID}' \
 --header 'Content-Type: application/json' \
 --data-raw ''
 ```
