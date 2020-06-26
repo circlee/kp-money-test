@@ -3,7 +3,7 @@ package com.kp.test.domain.repository;
 import com.kp.test.KpMoneySpreadApplication;
 import com.kp.test.domain.model.MoneySpreadToken;
 import com.kp.test.domain.model.MoneySpread;
-import com.kp.test.domain.service.AssignableTokenCreator;
+import com.kp.test.domain.service.AssignableTokenManager;
 import com.kp.test.domain.service.TokenGenerator;
 import com.kp.test.domain.vo.Price;
 import com.kp.test.domain.vo.RoomId;
@@ -31,19 +31,20 @@ public class MoneySpreadRepositoryTest {
     private MoneySpreadRepository moneySpreadRepository;
 
     @Autowired
-    private AssignableTokenCreator assignableTokenCreator;
+    private AssignableTokenManager assignableTokenManager;
 
     public MoneySpread getMoneySpread(int distributionSize) {
         RoomId roomId = RoomId.from(100L);
         UserId userId = UserId.from(100L);
-        MoneySpreadToken moneySpreadToken = assignableTokenCreator.createToken(roomId, userId);
-        return MoneySpread.create(
-                moneySpreadToken.getId()
-                , RoomId.from(100L)
+        MoneySpreadToken moneySpreadToken = assignableTokenManager.createToken(roomId, userId);
+
+        return moneySpreadToken.creadMoneySpread(
+                RoomId.from(100L)
+                , UserId.from(100L)
                 , Price.from(BigDecimal.valueOf(100L))
                 , distributionSize
-                , UserId.from(100L)
-        );
+                );
+
     }
 
     @Order(1)

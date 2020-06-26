@@ -2,12 +2,12 @@ package com.kp.test.application.service;
 
 import com.kp.test.application.dto.CreatMoneySpread;
 import com.kp.test.application.dto.MoneySpreadDetail;
-import com.kp.test.domain.model.MoneySpreadToken;
 import com.kp.test.domain.model.MoneySpread;
 import com.kp.test.domain.model.MoneySpreadDistribution;
-import com.kp.test.domain.repository.AssignableTokenRepository;
+import com.kp.test.domain.model.MoneySpreadToken;
 import com.kp.test.domain.repository.MoneySpreadRepository;
-import com.kp.test.domain.service.AssignableTokenCreator;
+import com.kp.test.domain.service.AssignableTokenManager;
+import com.kp.test.domain.service.MoneySpreadManager;
 import com.kp.test.domain.vo.Price;
 import com.kp.test.domain.vo.RoomId;
 import com.kp.test.domain.vo.Token;
@@ -25,29 +25,25 @@ import java.util.stream.Collectors;
 @Service
 public class MoneySpreadService {
 
-    private final AssignableTokenRepository assignableTokenRepository;
-
-    private final AssignableTokenCreator assignableTokenCreator;
+    private final AssignableTokenManager assignableTokenManager;
 
     private final MoneySpreadRepository moneySpreadRepository;
+
+    private final MoneySpreadManager moneySpreadManager;
 
     @Transactional
     public Token createMoneySpreadInRoom(Long aRoomId, Long anUserId, CreatMoneySpread creatMoneySpread) {
 
         RoomId roomId = RoomId.from(aRoomId);
         UserId userId = UserId.from(anUserId);
+        Price depositPrice = Price.from(creatMoneySpread.getDepositPrice());
+        int distributionSize = creatMoneySpread.getDistributionSize();
 
-        MoneySpreadToken moneySpreadToken = assignableTokenCreator.createToken(roomId, userId);
+        MoneySpreadToken moneySpreadToken = assignableTokenManager.createToken(roomId, userId);
 
-        MoneySpread moneySpread = MoneySpread.create(
-                moneySpreadToken.getId()
-                , roomId
-                , Price.from(creatMoneySpread.getDepositPrice())
-                , creatMoneySpread.getDistributionSize()
-                , userId
-        );
+        MoneySpread moneySpread = moneySpreadToken.creadMoneySpread(roomId, userId, depositPrice, distributionSize);
 
-        moneySpreadRepository.saveAndFlush(moneySpread);
+        moneySpreadRepository.save(moneySpread);
 
         return moneySpreadToken.getToken();
     }
@@ -59,11 +55,9 @@ public class MoneySpreadService {
         RoomId roomId = RoomId.from(aRoomId);
         UserId userId = UserId.from(aUserId);
 
-        MoneySpreadToken moneySpreadToken = getMoneySpreadToken(token, roomId);
+        MoneySpreadToken moneySpreadToken = assignableTokenManager.getValidMoneySpreadToken(token, roomId);
 
-        MoneySpread moneySpread = moneySpreadRepository.findByMoneySpreadTokenId(moneySpreadToken.getId())
-                .filter(ms -> !ms.isExpired())
-                .orElseThrow(() -> new KpCustomException(KpExceptionCode.NOT_AVAILABLE_MONEY_SPREAD));
+        MoneySpread moneySpread = moneySpreadManager.getActiveMoneySpread(moneySpreadToken);
 
         moneySpread.receiveDistribution(userId);
     }
@@ -75,12 +69,13 @@ public class MoneySpreadService {
         RoomId roomId = RoomId.from(aRoomId);
         UserId userId = UserId.from(aUserId);
 
-        MoneySpreadToken moneySpreadToken = getMoneySpreadToken(token, roomId);
+        MoneySpreadToken moneySpreadToken = assignableTokenManager.getValidMoneySpreadToken(token, roomId);
 
-        MoneySpread moneySpread = moneySpreadRepository.findByMoneySpreadTokenId(moneySpreadToken.getId())
-                .filter(ms -> ms.getCreatedBy().equals(userId))
-                .filter(ms -> !ms.isExpired())
-                .orElseThrow(() -> new KpCustomException(KpExceptionCode.NOT_AVAILABLE_MONEY_SPREAD));
+        MoneySpread moneySpread = moneySpreadManager.getActiveMoneySpread(moneySpreadToken);
+
+        if(!userId.equals(moneySpread.getCreatedBy())) {
+            throw new KpCustomException(KpExceptionCode.NOT_ACCEPTABLE_MONEY_SPREAD);
+        }
 
         Set<MoneySpreadDistribution> receivedMoneySpreadDistributions = moneySpread.getDistributions().stream()
                 .filter(MoneySpreadDistribution::isReceived)
@@ -100,12 +95,5 @@ public class MoneySpreadService {
                 .build();
     }
 
-    private MoneySpreadToken getMoneySpreadToken(Token token, RoomId roomId) {
 
-        MoneySpreadToken moneySpreadToken = assignableTokenRepository.findByTokenAndRoomId(token, roomId)
-                .filter(at -> !at.isExpired())
-                .orElseThrow(() -> new KpCustomException(KpExceptionCode.NOT_AVAILABLE_TOKEN));
-
-        return moneySpreadToken;
-    }
 }

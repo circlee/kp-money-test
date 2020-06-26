@@ -16,16 +16,16 @@ import java.math.BigDecimal;
 @EqualsAndHashCode
 public class CreatMoneySpread {
 
+    @NotNull
     @DecimalMin(value = "0", inclusive = false)
     @Digits(integer = Integer.MAX_VALUE, fraction = 0)
-    @NotNull
     private final BigDecimal depositPrice;
 
     @NotNull
     private final Integer distributionSize;
 
     @JsonCreator
-    public CreatMoneySpread(@JsonProperty("depoitPrice") BigDecimal depositPrice
+    public CreatMoneySpread(@JsonProperty("depositPrice") BigDecimal depositPrice
             , @JsonProperty("distributionSize") Integer distributionSize) {
 
         this.depositPrice = depositPrice;

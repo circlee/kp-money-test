@@ -1,9 +1,6 @@
 package com.kp.test.domain.model;
 
-import com.kp.test.domain.vo.MoneySpreadTokenId;
-import com.kp.test.domain.vo.RoomId;
-import com.kp.test.domain.vo.Token;
-import com.kp.test.domain.vo.UserId;
+import com.kp.test.domain.vo.*;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,7 +25,7 @@ public class MoneySpreadToken implements Serializable {
     private static final long serialVersionUID = 7884065933262181778L;
 
     @Transient
-    private static final int TOKEN_ACTIVE_DAY = 7;
+    private static final int DEAULT_TOKEN_AVAILABLE_DAY = 7;
 
     @Id
     private MoneySpreadTokenId id;
@@ -52,9 +49,13 @@ public class MoneySpreadToken implements Serializable {
     private Long version;
 
     public static MoneySpreadToken assignCreate(Token token, RoomId roomId, UserId userId) {
+        return assignCreate(token, roomId, userId, DEAULT_TOKEN_AVAILABLE_DAY);
+    }
+
+    public static MoneySpreadToken assignCreate(Token token, RoomId roomId, UserId userId, int availableDay) {
 
         LocalDateTime createdAt = LocalDateTime.now();
-        LocalDateTime expiredAt = createdAt.plusDays(TOKEN_ACTIVE_DAY);
+        LocalDateTime expiredAt = createdAt.plusDays(availableDay);
 
         return MoneySpreadToken.builder()
                 .id(MoneySpreadTokenId.from(UUID.randomUUID()))
@@ -72,7 +73,7 @@ public class MoneySpreadToken implements Serializable {
         }
 
         LocalDateTime createdAt = LocalDateTime.now();
-        LocalDateTime expiredAt = createdAt.plusDays(TOKEN_ACTIVE_DAY);
+        LocalDateTime expiredAt = createdAt.plusDays(DEAULT_TOKEN_AVAILABLE_DAY);
 
         this.setRoomId(roomId);
         this.setCreateUserId(userId);
@@ -82,5 +83,15 @@ public class MoneySpreadToken implements Serializable {
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(this.getExpiredAt());
+    }
+
+    public MoneySpread creadMoneySpread(RoomId roomId, UserId userId, Price depositPrice, int distributionSize) {
+        return MoneySpread.create(
+                this.getId()
+                , roomId
+                , depositPrice
+                , distributionSize
+                , userId
+        );
     }
 }

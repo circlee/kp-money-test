@@ -1,8 +1,4 @@
-/**
-* Copyright WITHINNOVATION Corp. All rights reserved.
-*
-* 여기 어때 Activity
-*/
+
 package com.kp.test.domain.service;
 
 import com.kp.test.KpMoneySpreadApplication;
@@ -21,16 +17,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
-/**
-* @author eldie
-*
-* MoneySpreadTokenCreatorTest.java
-*/
+
 @Slf4j
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 @ExtendWith(value = {SpringExtension.class})
 @SpringBootTest(classes = KpMoneySpreadApplication.class)
-class MoneySpreadTokenCreatorTest {
+class MoneySpreadTokenManagerTest {
 
 	@Autowired
 	private AssignableTokenRepository assignableTokenRepository;
@@ -46,7 +38,7 @@ class MoneySpreadTokenCreatorTest {
 		RoomId roomId = RoomId.from(1L);
 		UserId testUser100 = UserId.from(100L);
 		
-		AssignableTokenCreator tokenCreator = new AssignableTokenCreator(assignableTokenRepository, tokenGenerator);
+		AssignableTokenManager tokenCreator = new AssignableTokenManager(assignableTokenRepository, tokenGenerator);
 		
 		MoneySpreadToken moneySpreadToken = tokenCreator.createToken(roomId, testUser100);
 		
@@ -73,7 +65,7 @@ class MoneySpreadTokenCreatorTest {
 		
 		TokenGenerator fixedTokenGenerator = () -> Token.from("FIX");
 		
-		AssignableTokenCreator tokenCreator = new AssignableTokenCreator(assignableTokenRepository, fixedTokenGenerator);
+		AssignableTokenManager tokenCreator = new AssignableTokenManager(assignableTokenRepository, fixedTokenGenerator);
 		
 		Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
 			tokenCreator.createToken(roomId, testUser100);
@@ -93,11 +85,30 @@ class MoneySpreadTokenCreatorTest {
 		
 		TokenGenerator fixedTokenGenerator = () -> Token.from("TE1");
 		
-		AssignableTokenCreator tokenCreator = new AssignableTokenCreator(assignableTokenRepository, fixedTokenGenerator);
+		AssignableTokenManager tokenCreator = new AssignableTokenManager(assignableTokenRepository, fixedTokenGenerator);
 		
 		MoneySpreadToken moneySpreadToken1 = tokenCreator.createToken(roomId1, testUser100);
 		
 		Assertions.assertThrows(IllegalStateException.class, () -> moneySpreadToken1.assign(roomId2, testUser200));
-
 	}
+
+	@Order(3)
+	@DisplayName("expiredAt 이후 토큰 재할당 테스트")
+	@Test
+	void reAssignAfterExpiredTest() throws InterruptedException {
+
+		RoomId roomId1 = RoomId.from(1L);
+		RoomId roomId2 = RoomId.from(1L);
+		UserId testUser100 = UserId.from(100L);
+		UserId testUser200 = UserId.from(200L);
+
+		TokenGenerator fixedTokenGenerator = () -> Token.from("TE2");
+
+		AssignableTokenManager tokenCreator = new AssignableTokenManager(assignableTokenRepository, fixedTokenGenerator);
+
+		MoneySpreadToken moneySpreadToken1 = tokenCreator.createToken(roomId1, testUser100, 0);
+
+		moneySpreadToken1.assign(roomId2, testUser200);
+	}
+
 }

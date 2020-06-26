@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kp.test.KpMoneySpreadApplication;
 import com.kp.test.application.dto.CreatMoneySpread;
 import com.kp.test.application.dto.MoneySpreadToken;
-import com.kp.test.application.resolver.RoomUserHeaderArgumentResolver;
+import com.kp.test.infrastructure.config.resolver.RoomUserHeaderArgumentResolver;
 import com.kp.test.infrastructure.config.advice.ExceptionAdivce;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -86,7 +86,6 @@ public class MoneySpreadControllerTest {
             headers.add("x-room-id", String.valueOf(roomId));
         }
 
-
         return mockMvc.perform(
                     post("/spreads")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,6 +129,7 @@ public class MoneySpreadControllerTest {
         Long userId = 101L;
         Long roomId = 10001L;
 
+
         createCall(body, userId, roomId)
                 .andExpect(status().isBadRequest());
 
@@ -162,8 +162,7 @@ public class MoneySpreadControllerTest {
 
     private ResultActions receiveCall(String token, Long userId, Long roomId) throws Exception {
         return mockMvc.perform(
-                post("/spreads/receive")
-                        .queryParam("token", token)
+                post("/spreads/{token}/receive", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("x-user-id", userId)
                         .header("x-room-id", roomId)
@@ -199,12 +198,88 @@ public class MoneySpreadControllerTest {
         receiveCall(token, 203L, roomId)
                 .andExpect(status().isOk());
 
-        mockMvc.perform(
+        getDetailCall(createUserId, roomId, location)
+                .andExpect(status().isOk());
+
+    }
+
+    private ResultActions getDetailCall(Long createUserId, Long roomId, String location) throws Exception {
+        return mockMvc.perform(
                 get(location)
                         .header("x-user-id", createUserId)
                         .header("x-room-id", roomId)
-        )
+        );
+    }
+
+    @Order(6)
+    @DisplayName("뿌리기 중복 받기 예외 테스트")
+    @Test
+    public void receiveError1() throws Exception {
+
+        CreatMoneySpread createMoneySpread = new CreatMoneySpread(
+                new BigDecimal("20000")
+                , 5
+        );
+        String body = objectMapper.writeValueAsString(createMoneySpread);
+        Long createUserId = 101L;
+        Long roomId = 10001L;
+
+        MvcResult createResult = createCall(body, createUserId, roomId).andReturn();
+        byte[] responseBody = createResult.getResponse().getContentAsByteArray();
+        MoneySpreadToken tokenBody = objectMapper.readValue(responseBody, MoneySpreadToken.class);
+
+        String token = tokenBody.getToken();
+
+        receiveCall(token, 201L, roomId)
                 .andExpect(status().isOk());
+
+        receiveCall(token, 202L, roomId)
+                .andExpect(status().isOk());
+
+        receiveCall(token, 203L, roomId)
+                .andExpect(status().isOk());
+
+        receiveCall(token, 203L, roomId)
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Order(7)
+    @DisplayName("뿌리기 받기 초과 예외 테스트")
+    @Test
+    public void receiveError2() throws Exception {
+
+        CreatMoneySpread createMoneySpread = new CreatMoneySpread(
+                new BigDecimal("20000")
+                , 5
+        );
+        String body = objectMapper.writeValueAsString(createMoneySpread);
+        Long createUserId = 101L;
+        Long roomId = 10001L;
+
+        MvcResult createResult = createCall(body, createUserId, roomId).andReturn();
+        byte[] responseBody = createResult.getResponse().getContentAsByteArray();
+        MoneySpreadToken tokenBody = objectMapper.readValue(responseBody, MoneySpreadToken.class);
+
+        String token = tokenBody.getToken();
+
+        receiveCall(token, 201L, roomId)
+                .andExpect(status().isOk());
+
+        receiveCall(token, 202L, roomId)
+                .andExpect(status().isOk());
+
+        receiveCall(token, 203L, roomId)
+                .andExpect(status().isOk());
+
+        receiveCall(token, 204L, roomId)
+                .andExpect(status().isOk());
+
+        receiveCall(token, 205L, roomId)
+                .andExpect(status().isOk());
+
+        receiveCall(token, 206L, roomId)
+                .andExpect(status().isBadRequest());
 
     }
 

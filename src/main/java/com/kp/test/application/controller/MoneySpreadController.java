@@ -20,12 +20,10 @@ import java.util.Optional;
 @RestController
 public class MoneySpreadController {
 
-    private static final String TOKEN_QUERY_PARAM_NAME = "token";
-
     private final MoneySpreadService moneySpreadService;
 
     @PostMapping
-    public ResponseEntity createMoneySpread(@RequestBody @Valid CreatMoneySpread creatMoneySpread
+    public ResponseEntity createMoneySpread(@Valid @RequestBody CreatMoneySpread creatMoneySpread
             , RoomUserHeader roomUserHeader) {
 
         Token token = moneySpreadService.createMoneySpreadInRoom(
@@ -34,25 +32,28 @@ public class MoneySpreadController {
                 , creatMoneySpread);
 
         URI location = UriComponentsBuilder.fromPath("/spreads")
-                .queryParam(TOKEN_QUERY_PARAM_NAME, token.getValue())
+                .path("/" + token.getValue())
                 .build()
                 .toUri();
         return ResponseEntity.created(location)
                 .body(MoneySpreadToken.from(token));
     }
 
-    @PostMapping(value = "/receive", params = TOKEN_QUERY_PARAM_NAME)
-    public ResponseEntity receiveMoneySpread(@RequestParam(TOKEN_QUERY_PARAM_NAME) String token, RoomUserHeader roomUserHeader){
+    @Valid
+    @PostMapping(value = "/{token}/receive")
+    public ResponseEntity receiveMoneySpread(@PathVariable("token") String token
+            , RoomUserHeader roomUserHeader) {
 
-         moneySpreadService.receiveMoneySpread(token
+        moneySpreadService.receiveMoneySpread(token
                 , roomUserHeader.getRoomId()
                 , roomUserHeader.getUserId());
 
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(params = TOKEN_QUERY_PARAM_NAME)
-    public ResponseEntity getMoneSpreadDetail(@RequestParam(TOKEN_QUERY_PARAM_NAME) String token, RoomUserHeader roomUserHeader){
+    @GetMapping(value = "/{token}")
+    public ResponseEntity getMoneSpreadDetail(@PathVariable("token") String token
+            , RoomUserHeader roomUserHeader) {
 
         MoneySpreadDetail detail = moneySpreadService.getMoneySpreadDetail(token
                 , roomUserHeader.getRoomId()

@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface MoneySpreadRepository extends JpaRepository<MoneySpread, MoneySpreadId> {
 
     Optional<MoneySpread> findByMoneySpreadTokenId(MoneySpreadTokenId moneySpreadTokenId);
+
 }

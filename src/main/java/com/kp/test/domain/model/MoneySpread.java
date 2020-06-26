@@ -57,7 +57,7 @@ public class MoneySpread {
     @Version
     private Long version;
 
-    public static MoneySpread create(MoneySpreadTokenId moneySpreadTokenId, RoomId roomId, Price depositPrice, int distributionSize, UserId userId) {
+    protected static MoneySpread create(MoneySpreadTokenId moneySpreadTokenId, RoomId roomId, Price depositPrice, int distributionSize, UserId userId) {
 
         if (distributionSize <= 0) {
             throw new IllegalArgumentException("distributionSize 는 0 보타 작을수 없습니다");
@@ -90,7 +90,7 @@ public class MoneySpread {
 
     public void receiveDistribution(UserId userId) {
         if(this.createdBy.equals(userId)) {
-            throw new IllegalArgumentException("생성자는 받을 수 없습니다.");
+            throw new KpCustomException(KpExceptionCode.CREATOR_CAN_NOT_RECEIVE);
         }
 
         boolean isAlreadyReceived = this.getDistributions().stream()

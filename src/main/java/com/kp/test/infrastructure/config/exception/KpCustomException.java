@@ -25,6 +25,10 @@ public class KpCustomException extends RuntimeException {
         super();
     }
 
+    public KpCustomException(Throwable cause) {
+        super(cause);
+    }
+
     public KpCustomException(HttpStatus responseStatus, String message) {
         super(message);
         this.responseStatus = responseStatus;
@@ -45,7 +49,9 @@ public class KpCustomException extends RuntimeException {
         this(kpExceptionCode.getResponseStatus(), kpExceptionCode.getMessage(), cause);
     }
 
-
+    public static KpCustomException invalidParam(String message) {
+        return new KpCustomException(HttpStatus.BAD_REQUEST, message);
+    }
 
 
 
