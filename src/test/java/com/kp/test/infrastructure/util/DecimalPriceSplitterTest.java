@@ -1,7 +1,6 @@
-package com.kp.test.infrastructur.util;
+package com.kp.test.infrastructure.util;
 
 import com.kp.test.domain.vo.Price;
-import com.kp.test.infrastructure.util.DecimalPriceSplitter;
 import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
