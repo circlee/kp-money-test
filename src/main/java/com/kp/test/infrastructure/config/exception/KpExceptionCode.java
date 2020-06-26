@@ -5,7 +5,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum KpExceptionCode {
-    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 파라미터 입니다.")
+    DEFAULT(HttpStatus.INTERNAL_SERVER_ERROR, "오류가 발생하였습니다.")
+    , INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 파라미터 입니다.")
     , INVALID_HEADER(HttpStatus.BAD_REQUEST, "잘못된 헤더 입니다.")
     , NOT_AVAILABLE_TOKEN(HttpStatus.BAD_REQUEST, "이용 불가능한 토큰입니다")
     , NOT_ACCEPTABLE_MONEY_SPREAD(HttpStatus.BAD_REQUEST, "접근 불가능한 뿌리기입니다")

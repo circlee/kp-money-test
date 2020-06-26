@@ -2,7 +2,6 @@ package com.kp.test.infrastructure.config.exception;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,14 +9,13 @@ import java.util.Map;
 @Getter
 public class KpCustomException extends RuntimeException {
 
-    private HttpStatus responseStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-    private String message = "internal server error";
+    private KpExceptionCode exceptionCode = KpExceptionCode.DEFAULT;
 
     @JsonValue
     public Map<String, Object> getExceptionDetail(){
         Map<String, Object> detail = new HashMap<>();
-        detail.put("status", responseStatus.toString());
-        detail.put("message", message);
+        detail.put("status", exceptionCode.getResponseStatus());
+        detail.put("message", exceptionCode.getMessage());
         return detail;
     }
 
@@ -26,36 +24,18 @@ public class KpCustomException extends RuntimeException {
     }
 
     public KpCustomException(Throwable cause) {
-        super(cause);
-    }
-
-    public KpCustomException(HttpStatus responseStatus, String message) {
-        super(message);
-        this.responseStatus = responseStatus;
-        this.message = message;
+        super(KpExceptionCode.DEFAULT.getMessage(), cause);
     }
 
     public KpCustomException(KpExceptionCode kpExceptionCode) {
-        this(kpExceptionCode.getResponseStatus(), kpExceptionCode.getMessage());
-    }
-
-    public KpCustomException(HttpStatus responseStatus, String message, Throwable cause) {
-        super(message, cause);
-        this.responseStatus = responseStatus;
-        this.message = message;
+        super(kpExceptionCode.getMessage());
+        this.exceptionCode = kpExceptionCode;
     }
 
     public KpCustomException(KpExceptionCode kpExceptionCode, Throwable cause) {
-        this(kpExceptionCode.getResponseStatus(), kpExceptionCode.getMessage(), cause);
+        super(kpExceptionCode.getMessage(), cause);
+        this.exceptionCode = kpExceptionCode;
     }
-
-    public static KpCustomException invalidParam(String message) {
-        return new KpCustomException(HttpStatus.BAD_REQUEST, message);
-    }
-
-
-
-
 
 
 }
