@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface MoneySpreadRepository extends JpaRepository<MoneySpread, MoneySpreadId> {
 
-    @Lock(value = LockModeType.PESSIMISTIC_FORCE_INCREMENT)
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     Optional<MoneySpread> findByMoneySpreadTokenId(MoneySpreadTokenId moneySpreadTokenId);
 
 }
