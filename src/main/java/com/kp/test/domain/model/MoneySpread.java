@@ -1,6 +1,8 @@
 package com.kp.test.domain.model;
 
 import com.kp.test.domain.vo.*;
+import com.kp.test.infrastructure.config.exception.KpCustomException;
+import com.kp.test.infrastructure.config.exception.KpExceptionCode;
 import com.kp.test.infrastructure.util.DecimalPriceSplitter;
 import lombok.*;
 
@@ -91,17 +93,24 @@ public class MoneySpread {
             throw new IllegalArgumentException("생성자는 받을 수 없습니다.");
         }
 
+        boolean isAlreadyReceived = this.getDistributions().stream()
+                .filter(msd -> msd.isReceived())
+                .anyMatch(msd -> msd.getReceiver().equals(userId));
+
+        if(isAlreadyReceived) {
+            throw new KpCustomException(KpExceptionCode.ALREADY_RECEIVED);
+        }
+
         MoneySpreadDistribution remainDistribution = this.getDistributions().stream()
                 .filter(msd -> !msd.isReceived())
                 .filter(msd -> !isExpired())
                 .findAny()
-                .orElseThrow(() -> new RuntimeException("no remain..."));
+                .orElseThrow(() -> new KpCustomException(KpExceptionCode.NO_REMAIN_DISTRIBUTION));
 
         remainDistribution.receive(userId);
 
         this.setReceivedTotalPrice(this.getReceivedTotalPrice().add(remainDistribution.getPrice()));
     }
-
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(this.getExpiredAt());

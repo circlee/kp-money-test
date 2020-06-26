@@ -40,7 +40,6 @@ public class DecimalPriceSplitterTest {
         Assertions.assertThrows(UnsupportedOperationException.class, ()-> {
             origin.split(decimalPriceSplitter , 15);
         });
-
     }
 
 

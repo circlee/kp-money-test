@@ -2,6 +2,7 @@ package com.kp.test.application.controller;
 
 import com.kp.test.application.dto.CreatMoneySpread;
 import com.kp.test.application.dto.MoneySpreadDetail;
+import com.kp.test.application.dto.MoneySpreadToken;
 import com.kp.test.application.dto.RoomUserHeader;
 import com.kp.test.application.service.MoneySpreadService;
 import com.kp.test.domain.vo.Token;
@@ -19,6 +20,8 @@ import java.util.Optional;
 @RestController
 public class MoneySpreadController {
 
+    private static final String TOKEN_QUERY_PARAM_NAME = "token";
+
     private final MoneySpreadService moneySpreadService;
 
     @PostMapping
@@ -31,23 +34,25 @@ public class MoneySpreadController {
                 , creatMoneySpread);
 
         URI location = UriComponentsBuilder.fromPath("/spreads")
-                .queryParam("token", token.getValue())
+                .queryParam(TOKEN_QUERY_PARAM_NAME, token.getValue())
                 .build()
                 .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location)
+                .body(MoneySpreadToken.from(token));
     }
 
-    @PostMapping(params = "token")
-    public ResponseEntity receiveMoneySpread(@RequestParam("token") String token, RoomUserHeader roomUserHeader){
+    @PostMapping(value = "/receive", params = TOKEN_QUERY_PARAM_NAME)
+    public ResponseEntity receiveMoneySpread(@RequestParam(TOKEN_QUERY_PARAM_NAME) String token, RoomUserHeader roomUserHeader){
 
-        moneySpreadService.receiveMoneySpread(token
+         moneySpreadService.receiveMoneySpread(token
                 , roomUserHeader.getRoomId()
                 , roomUserHeader.getUserId());
+
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(params = "token")
-    public ResponseEntity getMoneSpreadDetail(@RequestParam("token") String token, RoomUserHeader roomUserHeader){
+    @GetMapping(params = TOKEN_QUERY_PARAM_NAME)
+    public ResponseEntity getMoneSpreadDetail(@RequestParam(TOKEN_QUERY_PARAM_NAME) String token, RoomUserHeader roomUserHeader){
 
         MoneySpreadDetail detail = moneySpreadService.getMoneySpreadDetail(token
                 , roomUserHeader.getRoomId()

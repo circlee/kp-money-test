@@ -1,6 +1,8 @@
 package com.kp.test.application.resolver;
 
 import com.kp.test.application.dto.RoomUserHeader;
+import com.kp.test.infrastructure.config.exception.KpCustomException;
+import com.kp.test.infrastructure.config.exception.KpExceptionCode;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -20,15 +22,16 @@ public class RoomUserHeaderArgumentResolver implements HandlerMethodArgumentReso
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-        try {
-            HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
+        try {
             Long roomId = Long.parseLong(request.getHeader("x-room-id"));
             Long userId = Long.parseLong(request.getHeader("x-user-id"));
 
             return new RoomUserHeader(roomId, userId);
         } catch (Exception e) {
-            throw new RuntimeException("");
+            throw new KpCustomException(KpExceptionCode.INVALID_HEADER);
         }
+
     }
 }

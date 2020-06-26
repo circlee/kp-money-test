@@ -12,6 +12,8 @@ import com.kp.test.domain.vo.Price;
 import com.kp.test.domain.vo.RoomId;
 import com.kp.test.domain.vo.Token;
 import com.kp.test.domain.vo.UserId;
+import com.kp.test.infrastructure.config.exception.KpCustomException;
+import com.kp.test.infrastructure.config.exception.KpExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +63,7 @@ public class MoneySpreadService {
 
         MoneySpread moneySpread = moneySpreadRepository.findByMoneySpreadTokenId(moneySpreadToken.getId())
                 .filter(ms -> !ms.isExpired())
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new KpCustomException(KpExceptionCode.NOT_AVAILABLE_MONEY_SPREAD));
 
         moneySpread.receiveDistribution(userId);
     }
@@ -78,24 +80,31 @@ public class MoneySpreadService {
         MoneySpread moneySpread = moneySpreadRepository.findByMoneySpreadTokenId(moneySpreadToken.getId())
                 .filter(ms -> ms.getCreatedBy().equals(userId))
                 .filter(ms -> !ms.isExpired())
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new KpCustomException(KpExceptionCode.NOT_AVAILABLE_MONEY_SPREAD));
 
         Set<MoneySpreadDistribution> receivedMoneySpreadDistributions = moneySpread.getDistributions().stream()
                 .filter(MoneySpreadDistribution::isReceived)
                 .collect(Collectors.toSet());
 
-
-//        뿌린시각,뿌린금액,받기완료된금액,받기완료된정보([받은금액,받은
-//        사용자 아이디] 리스트)
-
-        return null;
+        return MoneySpreadDetail.builder()
+                .spreadTime(moneySpread.getCreatedAt())
+                .spreadPrice(moneySpread.getDepositPrice().getValue())
+                .receivedTotalPrice(moneySpread.getReceivedTotalPrice().getValue())
+                .receivers(receivedMoneySpreadDistributions.stream()
+                        .map(msd -> MoneySpreadDetail.MoneySpreadDetail_Receiver.builder()
+                                .userId(msd.getReceiver().getValue())
+                                .receivedPrice(msd.getPrice().getValue())
+                                .build())
+                        .collect(Collectors.toList())
+                )
+                .build();
     }
 
     private MoneySpreadToken getMoneySpreadToken(Token token, RoomId roomId) {
 
         MoneySpreadToken moneySpreadToken = assignableTokenRepository.findByTokenAndRoomId(token, roomId)
                 .filter(at -> !at.isExpired())
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new KpCustomException(KpExceptionCode.NOT_AVAILABLE_TOKEN));
 
         return moneySpreadToken;
     }

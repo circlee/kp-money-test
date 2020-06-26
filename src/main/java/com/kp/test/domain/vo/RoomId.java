@@ -23,7 +23,7 @@ public class RoomId implements Serializable {
     public static RoomId from(Long value) {
 
         if (value == null) {
-            throw new IllegalArgumentException("token value cannot be empty");
+            throw new IllegalArgumentException("RoomId value cannot be empty");
         }
 
         return new RoomId(value);
