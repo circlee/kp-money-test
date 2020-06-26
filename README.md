@@ -43,7 +43,7 @@ MoneySpreadDistribution
   
 - 뿌리기 받기를 할 때, roomId와 토큰값을 이용하여 유효한 맵핑토큰을 획득하고
   유효한 뿌리기에 대해 "받기"를 합니다.
-  뿌리기 받기 시도에 대한 동시성 접근을 고려하여 룸과 토큰으로 조회시 비관적락(LockModeType.PESSIMISTIC_FORCE_INCREMENT)을 적용하였습니다. 
+  뿌리기 받기 시도에 대한 동시성 접근을 고려하여 룸과 토큰으로 조회시 비관적락(LockModeType.PESSIMISTIC_WRITE)을 적용하였습니다. 
   
 - 뿌리기 생성자가 뿌리기 보려할 때, roomId와 토큰값을 이용하여 유효한 맵핑토큰을 획득하고
   유효한 뿌리기를 조회하여 응답합니다.
